@@ -39,7 +39,9 @@ public class CurrencyPanel extends JPanel {
 	private JLabel resultLabel;
 	private JLabel inputLabel;
 	private JButton convertButton;
+	private Boolean fileLoaded = false;
 	ArrayList<String> errors = new ArrayList<String>();
+    ArrayList<Currency> currencyList = new ArrayList<Currency>();
 	
 	public MainPanel mainPanel;
 	
@@ -116,7 +118,13 @@ public class CurrencyPanel extends JPanel {
             String line = in.readLine();
             Currency currencies = null;
             ArrayList<String> newComboList = new ArrayList<String>();
-            ArrayList<Currency> currencyList = new ArrayList<Currency>();
+            
+            // reset the array list currencyList when file is reloaded
+            if(currencyList.size() > 0) {
+            	currencyList.clear();
+            }
+            
+            
             while ( line != null ) {
             	if(!validate(line)) {
             		String [] parts = line.split(",");
@@ -138,6 +146,8 @@ public class CurrencyPanel extends JPanel {
             	comboBox.addItem(comboItem);
             }
             
+            // set file is loaded
+            fileLoaded = true;
             //show errors occurred via dialogue box
             if(errors.size() > 0) {
             	errorDialogBox();
@@ -244,8 +254,11 @@ public class CurrencyPanel extends JPanel {
 				double factor = 0;
 				String symbol = "";
 				// Setup the correct factor/offset values depending on required conversion
-				switch (comboBox.getSelectedIndex()) {
-	
+				// run this part when file is not loaded
+				
+				if(!fileLoaded) {
+					switch (comboBox.getSelectedIndex()) {
+					
 					case 0: // Euro
 						symbol = "€";
 						if(mainPanel.isReverseSelected()) {
@@ -317,28 +330,44 @@ public class CurrencyPanel extends JPanel {
 							factor = 44.28;
 						}
 						break;
+					}
+					
 				}
+				
+				
+				// if file is loaded then
+				if(fileLoaded) {
+					for(Currency currency : currencyList) {
+						if(comboBox.getSelectedIndex() == currencyList.indexOf(currency)) {
+							symbol = currency.getSymbol();
+							if(mainPanel.isReverseSelected()) {
+								factor = 1/currency.getFactor();
+							}else {
+								factor = currency.getFactor();
+							}
+						}
+					}
+				}
+				
 				if(mainPanel.isReverseSelected()) {
 					symbol = "£";
 				}
+				
 				double result;
 				String finalResult;
 				
 				result = factor * value;
+				
 				// Show up to rounded two decimal places in result
 				DecimalFormat resultDf = new DecimalFormat("#.##");
 				resultDf.setRoundingMode(RoundingMode.CEILING);
 				String formattedResult = resultDf.format(result);
 				
 				if((comboBox.getSelectedIndex() == 4 || comboBox.getSelectedIndex() == 5) && !mainPanel.isReverseSelected()) {
-
 					finalResult = formattedResult + symbol;
 				}else {
 					finalResult = symbol + formattedResult;
 				}
-				
-				
-				
 			
 				//Update label that shows result
 				resultLabel.setText("Result: "+finalResult);
