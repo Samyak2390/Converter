@@ -11,8 +11,10 @@ import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.RoundingMode;
+import java.nio.file.Files;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
@@ -20,14 +22,10 @@ import java.util.regex.Pattern;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-
-//import converter.MainPanel.ConvertListener;
 
 public class CurrencyPanel extends JPanel {
 	private static String[] comboList = {"Euro (EU)","US Dollars (USD)", "Australian Dollars (AUD)", 
@@ -53,6 +51,7 @@ public class CurrencyPanel extends JPanel {
 	Boolean validate(String line) {
 		Boolean errorOccured = false;
 		String errorLine = "";
+		
 		//check if length is 3
 		String [] parts = line.split(",");
 		if(parts.length != 3) {
@@ -63,6 +62,24 @@ public class CurrencyPanel extends JPanel {
 			errorOccured = true;
 		}
 		
+		//check valid currency code
+//		if(parts[0] != null) {
+//			String currencyName = parts[0];
+//			int index1 = currencyName.indexOf('(');
+//			int index2 = currencyName.indexOf(')');
+//			
+//			String currencyCode = currencyName.substring(index1, index2);
+//			currencyCode = currencyCode.substring(1);
+//			
+//			try {
+//	            Currency curr = Currency.getInstance(currencyCode);
+//	        } catch (IllegalArgumentException e) {
+//	        	errorOccured = true;
+//	        	errorLine = errorLine + "<br/>* Invalid currency code.";
+//	        }
+//		}
+		
+		
 		//check if factor is double
 		try {
 			double factor = Double.parseDouble(parts[1].trim());
@@ -72,14 +89,14 @@ public class CurrencyPanel extends JPanel {
 			}
 			errorLine = errorLine + "<br/>* Given factor is not valid";
 			errorOccured = true;
-//			e.printStackTrace();
+			e.printStackTrace();
 		}
 		
 		//check if the symbol is valid currency symbol
 		try {
 			String symbol = parts[2].trim();
 	    	String regex = "\\p{Sc}";
-	    	Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+	    	Pattern pattern = Pattern.compile(regex);
 	    	Matcher matcher = pattern.matcher(symbol);
 	    	if(!matcher.find()) {
 	    		if(errorLine == "") {
@@ -88,8 +105,11 @@ public class CurrencyPanel extends JPanel {
 	    		errorLine = errorLine + "<br/>* Given currency symbol is invalid";
 				errorOccured = true;
 	    	}
+//	    	else {
+//	    		//check if existing symbol actually matches the given currency code
+//	    	}
 		}catch(Exception e) {
-//			e.printStackTrace();
+			e.printStackTrace();
 		}
 		
 		if(errorLine != "") {
@@ -148,6 +168,7 @@ public class CurrencyPanel extends JPanel {
             
             // set file is loaded
             fileLoaded = true;
+            
             //show errors occurred via dialogue box
             if(errors.size() > 0) {
             	errorDialogBox();
@@ -159,12 +180,13 @@ public class CurrencyPanel extends JPanel {
 //            }
             in.close();
         } catch (Exception e) {
-//        	e.printStackTrace();
+        	e.printStackTrace();
 //            String msg = e.getMessage();
         }
 	}
 	
 	CurrencyPanel(){
+		
 		//Object instantiation of ConvertListener class
 		ActionListener listener = new ConvertListener();
 		
@@ -227,6 +249,23 @@ public class CurrencyPanel extends JPanel {
 		add(resultLabel);
 		
 		setPreferredSize(new Dimension(600, 300));
+		
+		//check if there is currency.txt
+		// if present, then load automatically
+		try
+	      {
+			File currencyFile = new File("currency.txt");
+			if(currencyFile.exists()) {
+				loadCurrencyFile(currencyFile);
+				System.out.println(fileLoaded ? "currency.txt file loaded." : "");
+			}else {
+				System.out.println("No currency File.");
+			}
+	      } catch (Exception e)
+	      {
+	    	 JOptionPane.showMessageDialog(null, "Something went wrong while loading currency.txt!");
+	         e.printStackTrace();
+	      }
 	}
 	
 	private class ConvertListener implements ActionListener {
