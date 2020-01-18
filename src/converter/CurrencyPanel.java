@@ -11,14 +11,10 @@ import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.RoundingMode;
-import java.nio.file.Files;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -27,7 +23,16 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+/**
+ * This is the second graphical panel that implements the conversion between british pound to required currencies and vice versa.
+ * 
+ * @author Samyak Maharjan, ID: 77202779
+ */
+
 public class CurrencyPanel extends JPanel {
+	
+	// Declaring or Initializing required data
+	
 	private static String[] comboList = {"Euro (EU)","US Dollars (USD)", "Australian Dollars (AUD)", 
 			"Canadian Dollars (CAD)", "Icelandic Krona (ISK)", 
 			"United Arab Emirates Dirham (AED)", "South African Rand (ZAR)", "Thai Baht (THB)"};
@@ -43,11 +48,13 @@ public class CurrencyPanel extends JPanel {
 	
 	public MainPanel mainPanel;
 	
+	// Function to clear the values of textfield and result label
 	void clearValues(){
 		textField.setText(null);
 		resultLabel.setText("Result: -");
 	}
 	
+	// Function that validates the given line of string
 	Boolean validate(String line) {
 		Boolean errorOccured = false;
 		String errorLine = "";
@@ -62,24 +69,6 @@ public class CurrencyPanel extends JPanel {
 			errorOccured = true;
 		}
 		
-		//check valid currency code
-//		if(parts[0] != null) {
-//			String currencyName = parts[0];
-//			int index1 = currencyName.indexOf('(');
-//			int index2 = currencyName.indexOf(')');
-//			
-//			String currencyCode = currencyName.substring(index1, index2);
-//			currencyCode = currencyCode.substring(1);
-//			
-//			try {
-//	            Currency curr = Currency.getInstance(currencyCode);
-//	        } catch (IllegalArgumentException e) {
-//	        	errorOccured = true;
-//	        	errorLine = errorLine + "<br/>* Invalid currency code.";
-//	        }
-//		}
-		
-		
 		//check if factor is double
 		try {
 			double factor = Double.parseDouble(parts[1].trim());
@@ -89,27 +78,6 @@ public class CurrencyPanel extends JPanel {
 			}
 			errorLine = errorLine + "<br/>* Given factor is not valid";
 			errorOccured = true;
-			e.printStackTrace();
-		}
-		
-		//check if the symbol is valid currency symbol
-		try {
-			String symbol = parts[2].trim();
-	    	String regex = "\\p{Sc}";
-	    	Pattern pattern = Pattern.compile(regex);
-	    	Matcher matcher = pattern.matcher(symbol);
-	    	if(!matcher.find()) {
-	    		if(errorLine == "") {
-					errorLine = line;
-				}
-	    		errorLine = errorLine + "<br/>* Given currency symbol is invalid";
-				errorOccured = true;
-	    	}
-//	    	else {
-//	    		//check if existing symbol actually matches the given currency code
-//	    	}
-		}catch(Exception e) {
-			e.printStackTrace();
 		}
 		
 		if(errorLine != "") {
@@ -119,6 +87,7 @@ public class CurrencyPanel extends JPanel {
 		return errorOccured;
 	}
 	
+	// Function to show dialog box when error occurs
 	void errorDialogBox() {
 		String errorParagraph = "<html>";
 		for(String error: errors) {
@@ -130,6 +99,8 @@ public class CurrencyPanel extends JPanel {
 		
 		JOptionPane.showMessageDialog(null, errorInfo);
 	}
+	
+	//Function that loads the selected file from file chooser
 	
 	void loadCurrencyFile(File file) { 
         try {
@@ -144,7 +115,7 @@ public class CurrencyPanel extends JPanel {
             	currencyList.clear();
             }
             
-            
+            // keep reading the line until there is a line
             while ( line != null ) {
             	if(!validate(line)) {
             		String [] parts = line.split(",");
@@ -174,14 +145,9 @@ public class CurrencyPanel extends JPanel {
             	errorDialogBox();
             	errors.clear();
             }
-//            for(Currency currency:currencyList) {
-//            	char charSymbol = symbol.charAt(1);
-//                System.out.print(Character.getType(charSymbol) == Character.CURRENCY_SYMBOL);  
-//            }
             in.close();
         } catch (Exception e) {
-        	e.printStackTrace();
-//            String msg = e.getMessage();
+            String msg = e.getMessage();
         }
 	}
 	
@@ -374,7 +340,7 @@ public class CurrencyPanel extends JPanel {
 				}
 				
 				
-				// if file is loaded then
+				// if file is loaded then get the factor and symbol of currencies according to the clicked combolist item
 				if(fileLoaded) {
 					for(Currency currency : currencyList) {
 						if(comboBox.getSelectedIndex() == currencyList.indexOf(currency)) {
@@ -388,6 +354,7 @@ public class CurrencyPanel extends JPanel {
 					}
 				}
 				
+				// symbol is always pound if reverse is selected
 				if(mainPanel.isReverseSelected()) {
 					symbol = "£";
 				}
@@ -415,6 +382,4 @@ public class CurrencyPanel extends JPanel {
 			}
 		}
 	}
-
-	
 }

@@ -1,0 +1,4 @@
+Australian Dollars (AUD), 1.88, $
+Canadian Dollars (CAD),	1.70, $
+Euro (EUR), 1.17, €
+Icelandic krona(ISK), 160.34, kr

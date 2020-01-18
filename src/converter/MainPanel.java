@@ -31,8 +31,17 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JCheckBox;
 
+/**
+ * This is the main graphical panel used to display conversion components for different measurement units.
+ * 
+ * @author Samyak Maharjan, ID: 77202779
+ */
+
 @SuppressWarnings("serial")
 public class MainPanel extends JPanel {
+	
+	// Declaring or Initializing required data
+	
 	public CurrencyPanel currencyPanel;
 
 	private final static String[] comboList = { "inches/cm", "miles/nautical miles", "acres/hectares", "miles per hour/km per hour", "yards/metres", "celcius/fahrenheit", "degrees/radians" };
@@ -56,7 +65,21 @@ public class MainPanel extends JPanel {
 		
 		JLabel info = new JLabel(""
 				+ "<html>"
-					+ "<p style=\"font-size: 14px;\">This application allows the conversion between different units.</p>"
+					+ "<p style=\"font-size: 14px;\">This application allows the conversion between different units and british pounds to other currencies and vice versa.</p>"
+					+ "<p style=\"font-size: 12px;\"> First panel allows the conversion between: <br/>Miles/Nautical Miles"+
+					"<br>Acres/Hectares" + 
+					"<br>Miles per hour/Kilometres per hour" + 
+					"<br>Yards/Metres" + 
+					"<br>Celsius/Fahrenheit" + 
+					"<br>Degrees/Radians</p><br><br>"+
+					"<p style=\"font-size: 12px;\"> Second panel allows the currency conversion from british pounds to: <br/>Euro (EUR)"+
+					"<br>US Dollars (USD)" + 
+					"<br>Australian Dollars (AUD)" + 
+					"<br>Canadian Dollars (CAD)" + 
+					"<br>Icelandic Króna (ISK)" + 
+					"<br>United Arab Emirates Dirham (AED)" +
+					"<br>South African Rand (ZAR)" + 
+					"<br>Thai Baht (THB)<br>And its vice versa.</p>" 
 					+ "<p style=\"text-align: center; font-size: 12px;\">Author : Samyak Maharjan<br/>@ Copyright 2019</p>"
 				+ "</html>");
 		
@@ -78,8 +101,10 @@ public class MainPanel extends JPanel {
 		
 		//Load menu
 		JMenu loadFile = new JMenu("Load");
+		loadFile.setToolTipText("Click here to load the text file.");
 		loadFile.setMnemonic(KeyEvent.VK_L);
 		
+		// Use abstract class menuListener
 		loadFile.addMenuListener(new MenuListener() {
 			public void menuCanceled(MenuEvent arg0) {
 				System.out.println("Cancelled");
@@ -156,7 +181,6 @@ public class MainPanel extends JPanel {
 		//Create the combo box
 		comboBox = new JComboBox<String>(comboList);
 		comboBox.setToolTipText("Select your Choice here");
-		comboBox.addActionListener(listener); //convert values when option changed
 		comboBox.setFont(new Font("Tahoma", Font.BOLD, 14));
 		comboBox.setForeground(SystemColor.textHighlight);
 		comboBox.setBounds(273, 29, 237, 27);
